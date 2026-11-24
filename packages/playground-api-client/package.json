@@ -1,0 +1,31 @@
+{
+  "name": "playground-api-client",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The typed client of the API of playground, generated from its OpenAPI file and sent with openapi-fetch",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "node ../playground-client-generator/generate.ts ../../apps/playground-api/openapi.json src/generated/schema.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "openapi-fetch": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@zigordev/dev": "catalog:",
+    "@zigordev/otel": "catalog:",
+    "@zigordev/test": "catalog:",
+    "playground-api": "workspace:*",
+    "playground-client-generator": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
