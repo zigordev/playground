@@ -10,6 +10,5 @@ export async function GET(): Promise<Response> {
     service: config.OTEL_SERVICE_NAME,
     components: [{ name: 'api', required: false, check: () => pingApi(config.API_URL) }],
   });
-  const deployed = /^[0-9a-f]{40}$/.test(config.OTEL_SERVICE_VERSION ?? '');
-  return Response.json(report.body, { status: deployed ? 503 : report.statusCode });
+  return Response.json(report.body, { status: report.statusCode });
 }
