@@ -47,3 +47,18 @@ jobs:
       packages: write
       id-token: write
       attestations: write
+
+  deploy:
+    name: Deploy
+    needs: [publish]
+    if: github.event_name == 'push'
+    uses: zigordev/toolkit/.github/workflows/deploy.yml@0bc71363d6078f30a24455779350093449c28673 # v1.19.0
+    with:
+      target: playground
+      health-url: https://playground.zigordev.com/health
+    secrets:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+    permissions:
+      contents: read
+      id-token: write
+      attestations: read
