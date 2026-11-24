@@ -1,0 +1,30 @@
+services:
+  playground-api:
+    build:
+      context: .
+      dockerfile: apps/playground-api/Dockerfile
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=local
+      DATABASE_URL: postgresql://playground_api:local-only@playground-postgres:5432/playground_api
+    labels:
+      traefik.http.routers.playground-api.rule: Host(`playground.localhost`) && PathPrefix(`/api`)
+
+  playground-api-migrate:
+    environment:
+      DATABASE_URL: postgresql://playground_api:local-only@playground-postgres:5432/playground_api
+      DATABASE_ADMIN_URL: postgresql://postgres:local-only@playground-postgres:5432/postgres
+
+  playground-postgres:
+    environment:
+      POSTGRES_PASSWORD: local-only
+    ports:
+      - 127.0.0.1:5434:5432
+
+  playground-web:
+    build:
+      context: .
+      dockerfile: apps/playground-web/Dockerfile
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=local
+    labels:
+      traefik.http.routers.playground-web.rule: Host(`playground.localhost`)

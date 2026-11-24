@@ -1,0 +1,13 @@
+services:
+  playground-api:
+    depends_on: !reset []
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=production
+    labels:
+      traefik.http.routers.playground-api.rule: Host(`playground.zigordev.com`) && PathPrefix(`/api`)
+
+  playground-web:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=production
+    labels:
+      traefik.http.routers.playground-web.rule: Host(`playground.zigordev.com`)
