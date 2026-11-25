@@ -199,8 +199,8 @@ catalogs:
       specifier: 8.23.1
       version: 8.23.1
     '@types/react':
-      specifier: 19.3.0
-      version: 19.3.0
+      specifier: 19.3.1
+      version: 19.3.1
     '@types/react-dom':
       specifier: 19.3.0
       version: 19.3.0
@@ -391,10 +391,10 @@ importers:
         version: 26.6.6
       '@types/react':
         specifier: 'catalog:'
-        version: 19.3.0
+        version: 19.3.1
       '@types/react-dom':
         specifier: 'catalog:'
-        version: 19.3.0(@types/react@19.3.0)
+        version: 19.3.0(@types/react@19.3.1)
       '@zigordev/dev':
         specifier: 'catalog:'
         version: 1.33.1(@biomejs/biome@2.6.8)(@commitlint/cli@21.2.4(conventional-commits-parser@7.1.4)(typescript@7.0.2))(lefthook@2.2.1)(markdownlint-cli2@0.24.2(supports-color@10.2.2))
@@ -1673,8 +1673,8 @@ packages:
     peerDependencies:
       '@types/react': ^19.3.0
 
-  '@types/react@19.3.0':
-    resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
+  '@types/react@19.3.1':
+    resolution: {integrity: sha512-HNTkBIm8zmHX8LUXX2vtZ/ONzehrV1J3abl2fUIiZ5qxTYRCj/z+rDeFwOltqCLl9lRdUTKWT41OLtYuFV/Arg==}
 
   '@types/ssh2@1.15.6':
     resolution: {integrity: sha512-oGdxhBqcRTwSTKFm+9EiKzkNVYRLEFkcW44lhguvBalGJbWfGnDt/ezwSUZc+SF9m9bMc3VyklNAtp7zICjS5w==}
@@ -4609,11 +4609,11 @@ snapshots:
       pg-protocol: 1.16.1
       pg-types: 2.2.0
 
-  '@types/react-dom@19.3.0(@types/react@19.3.0)':
+  '@types/react-dom@19.3.0(@types/react@19.3.1)':
     dependencies:
-      '@types/react': 19.3.0
+      '@types/react': 19.3.1
 
-  '@types/react@19.3.0':
+  '@types/react@19.3.1':
     dependencies:
       csstype: 3.2.4
 
