@@ -409,16 +409,16 @@ the compose files
   kept    7  every other image is pinned by its digest: postgres
   kept    7  every long-running service restarts unless stopped, and a job never does
   kept    7  playground-api and playground-web drain before they stop: no fixed name or port, /tmp in memory, and the pre-stop hook of docker-rollout
-  kept    7  .env.production.example names 4 secrets, with no value, and the compose files use no other
+  kept    7  .env.production.example names 5 secrets, with no value, and the compose files use no other
   kept    7  compose.production.yaml routes playground-api and playground-web to playground.zigordev.com
   kept    7  playground-postgres carries the label com.zigordev.backup: postgres, so the backup on the host finds it
 playground-api
   kept    1  an arm64 image that runs as the user 1000:1000
   kept    2  without its settings it stops at once, with code 1
   kept    3  it listens on the port in PORT, and answers GET /health with 200 and its version local
-  kept    4  7 lines, all JSON, with nothing a visitor sent
+  kept    4  8 lines, all JSON, with nothing a visitor sent
   kept    5  traces and metrics reached the agent under the name playground-api
-  kept    6  it stopped 6.7 s after a SIGTERM with code 0, and answered the request it had begun
+  kept    6  it stopped 1.4 s after a SIGTERM with code 0, and answered the request it had begun
   kept    7  its health check fails while /tmp/drain exists, and passes again once it is gone
 playground-web
   kept    1  an arm64 image that runs as the user 1000:1000
@@ -426,7 +426,7 @@ playground-web
   kept    3  it listens on the port in PORT, and answers GET /health with 200 and its version local
   kept    4  6 lines, all JSON, with nothing a visitor sent
   kept    5  traces and metrics reached the agent under the name playground-web
-  kept    6  it stopped 6.4 s after a SIGTERM with code 143, and answered the request it had begun
+  kept    6  it stopped 1.4 s after a SIGTERM with code 143, and answered the request it had begun
   kept    7  its health check fails while /tmp/drain exists, and passes again once it is gone
 playground-api-migrate, a job
   kept    1  it ended with code 0 before playground-api started
