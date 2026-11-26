@@ -2,7 +2,7 @@
   "name": "playground-api-client",
   "version": "0.0.0",
   "private": true,
-  "description": "The typed client of the API of playground, generated from its OpenAPI file and sent with openapi-fetch",
+  "description": "The typed client of the playground's API, generated from its OpenAPI file and sent with openapi-fetch",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
