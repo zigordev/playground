@@ -3,7 +3,7 @@ packages:
   - packages/*
 
 catalog:
-  "@biomejs/biome": 2.6.8
+  "@biomejs/biome": 2.6.9
   "@commitlint/cli": 21.2.4
   "@opentelemetry/api": 1.10.0
   "@types/node": 26.6.7
