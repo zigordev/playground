@@ -18,7 +18,7 @@ function address(role: string, password: string, database: string): string {
 
 describe('the migrate job', () => {
   it('makes the role and database of the app, migrates them, and ends with code 0', async () => {
-    const name = `template_${randomUUID().replaceAll('-', '').slice(0, 10)}`;
+    const name = `playground_${randomUUID().replaceAll('-', '').slice(0, 10)}`;
     const password = randomBytes(18).toString('base64url');
     const logs = captureLogs();
 
@@ -33,7 +33,7 @@ describe('the migrate job', () => {
 
     expect(code).toBe(0);
     expect(logs.find('migration.finished')).toEqual([
-      expect.objectContaining({ applied: 2, total: 2 }),
+      expect.objectContaining({ applied: 5, total: 5 }),
     ]);
     const client = new pg.Client({ connectionString: address(name, password, name) });
     await client.connect();

@@ -34,9 +34,11 @@ This page takes a laptop with nothing installed to the playground running in con
    pnpm local:up
    ```
 
-   It ends when every container is healthy. Open <http://playground.localhost> for the page, and <http://grafana.localhost> for the logs, traces and metrics of both apps.
+   It ends when every container is healthy, the notifications service's too. Open <http://playground.localhost> for the page, and <http://grafana.localhost> for the logs, traces and metrics of both apps.
 
-4. Run the whole check, as the pipeline does. Docker has to run, because the API's tests start a real PostgreSQL:
+   To try sign-in, make an account at <http://playground.localhost/sign-up>. The email to confirm it arrives in Mailpit, at <http://mail.localhost>, within a few seconds.
+
+4. Run the whole check, as the pipeline does. Docker has to run, because the API's tests start a real PostgreSQL and a real Kafka:
 
    ```bash
    pnpm check
@@ -49,6 +51,16 @@ This page takes a laptop with nothing installed to the playground running in con
    ```
 
 To edit one app with hot reload beside the containers, run `pnpm dev api` or `pnpm dev web`. The [README](../README.md) explains both ways to run it, and every setting.
+
+To run the web app's browser tests and its page check in Chromium, as the [README](../README.md#the-pages-and-their-security) says, install Chromium once, then build and run them:
+
+```bash
+pnpm exec playwright install chromium
+```
+
+```bash
+pnpm build && pnpm test:browser
+```
 
 ## When something does not work
 

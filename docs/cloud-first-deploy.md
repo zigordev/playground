@@ -27,15 +27,18 @@ On the host, the deploy reads `compose.yaml`, `compose.production.yaml` and `.en
 
 None of these is in this repo. The owner does each of them once.
 
-| What                                                                                                                                                                                                         | Who                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| The deploy target `playground` in `platform/infra/products.json`, which brings its command, its role, the environment `production` and the address                                                           | The platform session, with the owner's approval of the plan |
-| The repo secret `AWS_ACCOUNT_ID`                                                                                                                                                                             | The owner, in the repo's settings                           |
-| `/playground/POSTGRES_PASSWORD`, `/playground/PLAYGROUND_API_DATABASE_PASSWORD` and `/playground/PLAYGROUND_API_KEYS` in AWS Parameter Store, as SecureString, with the commands [below](#the-three-secrets) | The owner                                                   |
-| Both image packages made public, after the first publish, if GitHub created them as private                                                                                                                  | The owner, in each package's settings                       |
-| The dependency graph switched on, which Dependency Review needs                                                                                                                                              | The owner, in the repo's settings                           |
+| What                                                                                                                                                                                                                                                                                | Who                                                         |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| The deploy target `playground` in `platform/infra/products.json`, which brings its command, its role, the environment `production` and the address                                                                                                                                  | The platform session, with the owner's approval of the plan |
+| The repo secret `AWS_ACCOUNT_ID`                                                                                                                                                                                                                                                    | The owner, in the repo's settings                           |
+| `/playground/POSTGRES_PASSWORD`, `/playground/PLAYGROUND_API_DATABASE_PASSWORD`, `/playground/PLAYGROUND_API_KEYS`, `/playground/KAFKA_PASSWORD` and `/playground/PLAYGROUND_API_AUTH_SECRET` in AWS Parameter Store, as SecureString, with the commands [below](#the-five-secrets) | The owner                                                   |
+| The Kafka user `playground-api`, its four topics and its rules on every broker, in `platform`'s `KAFKA_SETUP` ([platform#91](https://github.com/zigordev/platform/pull/91))                                                                                                         | The platform session, with the owner's approval of the plan |
+| The entry of `playground-api` in the notifications service's `producers.json` ([notifications#29](https://github.com/zigordev/notifications/pull/29)), after the topics exist in production                                                                                         | A session in `notifications`                                |
+| SES out of its sandbox, so that the emails of sign-in reach any address and not only the verified ones                                                                                                                                                                              | The owner, on AWS's support case                            |
+| Both image packages made public, after the first publish, if GitHub created them as private                                                                                                                                                                                         | The owner, in each package's settings                       |
+| The dependency graph switched on, which Dependency Review needs                                                                                                                                                                                                                     | The owner, in the repo's settings                           |
 
-## The three secrets
+## The five secrets
 
 The host reads each name of `.env.production.example` from Parameter Store under `/playground/<NAME>`, and refuses to deploy while one is missing. The owner stores them with the profile `platform-ops`. Each command below makes the value without showing it, and a value is never typed by hand.
 
@@ -61,6 +64,18 @@ A list with one key keeps only the key's SHA-256. The key itself is shown once, 
 
 ```bash
 KEY="$(openssl rand -hex 32)" && echo "The key, shown once: $KEY" && jq -n --arg sha256 "$(printf '%s' "$KEY" | shasum -a 256 | cut -d' ' -f1)" '[{name: "owner", sha256: $sha256, scopes: ["notes:read", "notes:write"]}]' > keys.json && jq -e 'type == "array" and all(.[]; .sha256 | test("^[0-9a-f]{64}$"))' keys.json && aws ssm put-parameter --profile platform-ops --region eu-west-1 --type SecureString --overwrite --name /playground/PLAYGROUND_API_KEYS --value file://keys.json && rm keys.json
+```
+
+The Kafka password signs the API in to the broker as `playground-api`. The shared services read the same parameter to make that user, so it is stored before the merge in `platform` that adds the user:
+
+```bash
+aws ssm put-parameter --profile platform-ops --region eu-west-1 --type SecureString --name /playground/KAFKA_PASSWORD --value "$(openssl rand -base64 48 | tr -d '/+=' | cut -c1-48)"
+```
+
+The sign-in secret signs the sessions and the links in the emails. It needs at least 32 characters, and a new one signs every person out:
+
+```bash
+aws ssm put-parameter --profile platform-ops --region eu-west-1 --type SecureString --name /playground/PLAYGROUND_API_AUTH_SECRET --value "$(openssl rand -hex 32)"
 ```
 
 A changed secret reaches the apps with the next deploy.

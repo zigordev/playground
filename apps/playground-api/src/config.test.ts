@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { parseEnv } from 'node:util';
 import { ConfigError } from '@zigordev/config';
 import { describe, expect, it } from 'vitest';
-import { readConfig, readMigrateConfig } from './config.ts';
+import { kafkaOf, readConfig, readMigrateConfig, signInOf } from './config.ts';
 
 const development = parseEnv(readFileSync(new URL('../.env.development', import.meta.url), 'utf8'));
 const database = 'postgresql://playground_api@127.0.0.1:5434/playground_api';
@@ -26,6 +27,7 @@ describe('readConfig', () => {
       OTEL_SERVICE_NAME: 'playground-api',
       DATABASE_URL: database,
       API_KEYS: [],
+      FLAGS_FILE: fileURLToPath(new URL('../flags.json', import.meta.url)),
     });
   });
 
@@ -80,6 +82,108 @@ describe('readConfig', () => {
   });
 });
 
+const base = { OTEL_SERVICE_NAME: 'playground-api', DATABASE_URL: database };
+const kafka = {
+  KAFKA_BROKERS: 'kafka:9092',
+  KAFKA_USERNAME: 'playground-api',
+  KAFKA_PASSWORD: 'local-only-playground-api',
+};
+
+describe('the Kafka settings', () => {
+  it('leave Kafka off when none is given', () => {
+    expect(kafkaOf(readConfig(base))).toBeUndefined();
+  });
+
+  it('reach Kafka as the app, with all three', () => {
+    expect(kafkaOf(readConfig({ ...base, ...kafka, KAFKA_BROKERS: 'one:9092, two:9093' }))).toEqual(
+      {
+        clientId: 'playground-api',
+        brokers: ['one:9092', 'two:9093'],
+        username: 'playground-api',
+        password: 'local-only-playground-api',
+      }
+    );
+  });
+
+  it('refuse some of them without the others', () => {
+    expect(issues(() => readConfig({ ...base, KAFKA_BROKERS: 'kafka:9092' }))).toEqual([
+      'KAFKA_USERNAME',
+      'KAFKA_PASSWORD',
+    ]);
+    expect(issues(() => readConfig({ ...base, ...kafka, KAFKA_PASSWORD: '' }))).toEqual([
+      'KAFKA_PASSWORD',
+    ]);
+  });
+
+  it('refuse a broker that is no host and port', () => {
+    expect(issues(() => readConfig({ ...base, ...kafka, KAFKA_BROKERS: 'kafka' }))).toEqual([
+      expect.stringMatching(/^KAFKA_BROKERS/),
+    ]);
+  });
+});
+
+describe('the sign-in settings', () => {
+  const secret = 'a-secret-that-is-at-least-thirty-two-characters-long';
+  const on = {
+    ...base,
+    ...kafka,
+    AUTH_SECRET: secret,
+    AUTH_URL: 'http://playground.localhost',
+  };
+
+  it('leave sign-in off when there is no secret and no address', () => {
+    expect(signInOf(readConfig(base))).toBeUndefined();
+  });
+
+  it('turn sign-in on with a secret, an address and Kafka, and Google only with both of its values', () => {
+    expect(signInOf(readConfig(on))?.methods).toEqual(['email', 'passkey']);
+    const google = signInOf(
+      readConfig({ ...on, AUTH_GOOGLE_CLIENT_ID: 'id', AUTH_GOOGLE_CLIENT_SECRET: 'secret' })
+    );
+    expect(google?.methods).toEqual(['email', 'passkey', 'google']);
+    expect(google?.config).toMatchObject({
+      AUTH_URL: 'http://playground.localhost',
+      AUTH_GOOGLE_CLIENT_ID: 'id',
+    });
+  });
+
+  it('refuse half of the sign-in settings', () => {
+    expect(issues(() => readConfig({ ...base, ...kafka, AUTH_SECRET: secret }))).toEqual([
+      'AUTH_URL',
+    ]);
+    expect(
+      issues(() => readConfig({ ...base, ...kafka, AUTH_URL: 'http://playground.localhost' }))
+    ).toEqual(['AUTH_SECRET']);
+    expect(issues(() => readConfig({ ...on, AUTH_GOOGLE_CLIENT_ID: 'id' }))).toEqual([
+      'AUTH_GOOGLE_CLIENT_SECRET',
+    ]);
+    expect(issues(() => readConfig({ ...on, AUTH_GOOGLE_CLIENT_SECRET: 'secret' }))).toEqual([
+      'AUTH_GOOGLE_CLIENT_ID',
+    ]);
+  });
+
+  it('refuse sign-in without Kafka, which carries its emails to the notifications service', () => {
+    const {
+      KAFKA_BROKERS: _brokers,
+      KAFKA_USERNAME: _user,
+      KAFKA_PASSWORD: _password,
+      ...alone
+    } = on;
+
+    expect(issues(() => readConfig(alone))).toEqual([
+      'KAFKA_BROKERS',
+      'KAFKA_USERNAME',
+      'KAFKA_PASSWORD',
+    ]);
+  });
+
+  it('turn sign-in on over https too, now that its emails leave the app', () => {
+    expect(
+      signInOf(readConfig({ ...on, AUTH_URL: 'https://playground.zigordev.com' }))?.config.AUTH_URL
+    ).toBe('https://playground.zigordev.com');
+  });
+});
+
 describe('readMigrateConfig', () => {
   it('takes the address of the app and, when there is one, the address of the superuser', () => {
     expect(
@@ -108,6 +212,17 @@ describe('the settings of pnpm dev', () => {
       DATABASE_URL: expect.stringMatching(
         /^postgresql:\/\/playground_api:[^@]+@127\.0\.0\.1:5434\/playground_api$/
       ),
+    });
+  });
+
+  it('turn sign-in on for the web app on this Mac, and reach Kafka on this Mac as the app', () => {
+    const config = readConfig(development);
+
+    expect(signInOf(config)?.config.AUTH_URL).toBe('http://localhost:3001');
+    expect(signInOf(config)?.methods).toEqual(['email', 'passkey']);
+    expect(kafkaOf(config)).toMatchObject({
+      brokers: ['localhost:9094'],
+      username: 'playground-api',
     });
   });
 

@@ -6,6 +6,9 @@ services:
     environment:
       OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=local
       DATABASE_URL: postgresql://playground_api:local-only@playground-postgres:5432/playground_api
+      AUTH_SECRET: local-only-sign-in-secret-of-the-playground-api
+      AUTH_URL: http://playground.localhost
+      KAFKA_PASSWORD: local-only-playground-api
     labels:
       traefik.http.routers.playground-api.rule: Host(`playground.localhost`) && PathPrefix(`/api`)
 

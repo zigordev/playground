@@ -6,6 +6,7 @@ export type { operations, paths } from './generated/schema.ts';
 export interface ClientOptions {
   readonly baseUrl: string;
   readonly key?: string;
+  readonly headers?: Readonly<Record<string, string>>;
   readonly fetch?: typeof globalThis.fetch;
 }
 
@@ -14,7 +15,10 @@ export type PlaygroundApiClient = Client<paths>;
 export function createPlaygroundApiClient(options: ClientOptions): PlaygroundApiClient {
   return createClient<paths>({
     baseUrl: options.baseUrl,
-    headers: options.key === undefined ? {} : { authorization: `Bearer ${options.key}` },
+    headers: {
+      ...options.headers,
+      ...(options.key === undefined ? {} : { authorization: `Bearer ${options.key}` }),
+    },
     ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
   });
 }

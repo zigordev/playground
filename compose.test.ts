@@ -109,10 +109,10 @@ describe.each(apps)('%s while it is edited', (app) => {
   ).scripts;
   const development = parseEnv(readFileSync(`${folder}apps/${app}/.env.development`, 'utf8'));
 
-  it('has a dev script that reloads it on a change, on this Mac only', () => {
+  it('has a dev script that reloads it on a change, on this Mac only, with its untracked settings', () => {
     expect(scripts.dev).toBe(
       app === 'playground-api'
-        ? 'node --env-file=.env.development --watch --import @zigordev/otel/register src/main.ts'
+        ? 'node --env-file=.env.development --env-file-if-exists=.env.local --watch --import @zigordev/otel/register src/main.ts'
         : 'NEXT_TELEMETRY_DISABLED=1 next dev --hostname 127.0.0.1 --port 3001'
     );
   });
@@ -369,11 +369,51 @@ describe('playground-postgres, the store', () => {
   });
 });
 
+describe('playground-api and the broker', () => {
+  const api = 'playground-api';
+  const development = parseEnv(readFileSync(`${folder}apps/${api}/.env.development`, 'utf8'));
+
+  it('sends its email requests to the broker on the shared network, as its own Kafka user', () => {
+    expect(everywhere.services[api]?.environment).toMatchObject({
+      KAFKA_BROKERS: 'kafka:9092',
+      KAFKA_USERNAME: api,
+    });
+    expect(development).toMatchObject({ KAFKA_BROKERS: 'localhost:9094', KAFKA_USERNAME: api });
+  });
+
+  it('signs in to Kafka with a throwaway password on the laptop, and with its secret in production', () => {
+    expect(laptop.services[api]?.environment?.KAFKA_PASSWORD).toBe('local-only-playground-api');
+    expect(development.KAFKA_PASSWORD).toBe('local-only-playground-api');
+    expect(production.services[api]?.environment?.KAFKA_PASSWORD).toBe('');
+  });
+});
+
+describe('playground-api and sign-in', () => {
+  const api = 'playground-api';
+
+  it('turns sign-in on at its laptop address, with a throwaway secret', () => {
+    expect(laptop.services[api]?.environment).toMatchObject({
+      AUTH_SECRET: 'local-only-sign-in-secret-of-the-playground-api',
+      AUTH_URL: 'http://playground.localhost',
+    });
+  });
+
+  it('turns sign-in on in production at its own address, with its secret from Parameter Store', () => {
+    expect(production.services[api]?.environment).toMatchObject({
+      AUTH_SECRET: '',
+      AUTH_URL: 'https://playground.zigordev.com',
+    });
+    expect(everywhere.services[api]?.environment?.AUTH_SECRET).toBeUndefined();
+  });
+});
+
 describe('the secrets of production', () => {
   it('are named in .env.production.example, and only named', () => {
     const example = parseEnv(readFileSync(`${folder}.env.production.example`, 'utf8'));
 
     expect(Object.keys(example).sort()).toEqual([
+      'KAFKA_PASSWORD',
+      'PLAYGROUND_API_AUTH_SECRET',
       'PLAYGROUND_API_DATABASE_PASSWORD',
       'PLAYGROUND_API_KEYS',
       'POSTGRES_PASSWORD',

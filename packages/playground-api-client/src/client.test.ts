@@ -61,4 +61,20 @@ describe('createPlaygroundApiClient', () => {
 
     expect(seen[0]?.headers.has('authorization')).toBe(false);
   });
+
+  it('sends the headers it is given, such as the cookie of the person a page is for', async () => {
+    const seen: Request[] = [];
+    const client = createPlaygroundApiClient({
+      baseUrl: 'http://api.test',
+      headers: { cookie: 'playground.session_token=abc' },
+      fetch: async (request) => {
+        seen.push(request as Request);
+        return Response.json({ message: 'hello' });
+      },
+    });
+
+    await client.GET('/api/v1/hello');
+
+    expect(seen[0]?.headers.get('cookie')).toBe('playground.session_token=abc');
+  });
 });

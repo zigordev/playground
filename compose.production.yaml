@@ -3,6 +3,8 @@ services:
     depends_on: !reset []
     environment:
       OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=production
+      AUTH_SECRET: ${PLAYGROUND_API_AUTH_SECRET:-}
+      AUTH_URL: https://playground.zigordev.com
     labels:
       traefik.http.routers.playground-api.rule: Host(`playground.zigordev.com`) && PathPrefix(`/api`)
 

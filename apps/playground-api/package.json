@@ -2,7 +2,7 @@
   "name": "playground-api",
   "version": "0.0.0",
   "private": true,
-  "description": "The API of playground: a Fastify service that answers the health route and says hello",
+  "description": "The API of the playground: a Fastify service that answers the health route and says hello",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
@@ -11,20 +11,28 @@
   "files": [
     "src",
     "drizzle",
+    "flags.json",
     "!src/**/*.test.ts"
   ],
   "scripts": {
     "start": "node --import @zigordev/otel/register src/main.ts",
-    "dev": "node --env-file=.env.development --watch --import @zigordev/otel/register src/main.ts",
+    "dev": "node --env-file=.env.development --env-file-if-exists=.env.local --watch --import @zigordev/otel/register src/main.ts",
     "typecheck": "tsc -p tsconfig.json",
     "db:generate": "drizzle-kit generate",
     "migrate": "node --env-file=.env.development src/migrate.ts",
     "openapi": "node src/openapi.ts"
   },
   "dependencies": {
+    "@grpc/grpc-js": "catalog:",
+    "@openfeature/server-sdk": "catalog:",
     "@opentelemetry/api": "catalog:",
     "@zigordev/api": "catalog:",
+    "@zigordev/auth": "catalog:",
     "@zigordev/config": "catalog:",
+    "@zigordev/email": "catalog:",
+    "@zigordev/events": "catalog:",
+    "@zigordev/flags": "catalog:",
+    "@zigordev/notifications-events": "catalog:",
     "@zigordev/otel": "catalog:",
     "drizzle-orm": "catalog:",
     "fastify": "catalog:",

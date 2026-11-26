@@ -2,7 +2,7 @@
   "name": "playground-client-generator",
   "version": "0.0.0",
   "private": true,
-  "description": "Writes the TypeScript types of the API of playground from its OpenAPI file, with openapi-typescript on its own TypeScript 5.9.3",
+  "description": "Writes the TypeScript types of the playground's API from its OpenAPI file, with openapi-typescript on its own TypeScript 5.9.3",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {

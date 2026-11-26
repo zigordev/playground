@@ -2,7 +2,7 @@
   "name": "playground-web",
   "version": "0.0.0",
   "private": true,
-  "description": "The web app of playground: a Next.js app that shows what the API says",
+  "description": "The web app of the playground: a Next.js app that shows what the API says",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
@@ -12,22 +12,39 @@
     "build": "NEXT_TELEMETRY_DISABLED=1 next build",
     "dev": "NEXT_TELEMETRY_DISABLED=1 next dev --hostname 127.0.0.1 --port 3001",
     "start": "NEXT_TELEMETRY_DISABLED=1 NEXT_OTEL_FETCH_DISABLED=1 node --import @zigordev/otel/register node_modules/next/dist/bin/next start",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "test:browser": "vitest run --config vitest.browser.config.ts --coverage && vitest run --config vitest.pages.config.ts"
   },
   "dependencies": {
+    "@fontsource-variable/jetbrains-mono": "catalog:",
+    "@fontsource-variable/mona-sans": "catalog:",
     "@opentelemetry/api": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "@zigordev/auth": "catalog:",
     "@zigordev/config": "catalog:",
     "@zigordev/otel": "catalog:",
+    "@zigordev/ui": "catalog:",
     "next": "catalog:",
+    "next-intl": "catalog:",
+    "openapi-react-query": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-hook-form": "catalog:",
+    "playground-api-client": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@axe-core/playwright": "catalog:",
+    "@inlang/cli": "catalog:",
+    "@inlang/plugin-next-intl": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "@zigordev/dev": "catalog:",
+    "playwright": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

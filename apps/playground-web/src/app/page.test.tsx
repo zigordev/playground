@@ -2,6 +2,8 @@ import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { testLocale } from '../../test/locale.ts';
+import { asHtml, textsIn } from '../../test/texts.ts';
 
 let server: Server;
 
@@ -32,12 +34,25 @@ describe('the home page', () => {
   it('shows what the API says', async () => {
     const html = await render(`http://127.0.0.1:${(server.address() as AddressInfo).port}`);
 
-    expect(html).toBe('<main><h1>Playground</h1><p>Hello from the stand-in</p></main>');
+    const en = textsIn('en');
+    expect(html).toContain(`<h1>${asHtml(en('home.title'))}</h1><p>Hello from the stand-in</p>`);
+    expect(html).toMatch(/href="\/account"[^>]*>/);
+    expect(html).toContain(`>${asHtml(en('home.account'))}</a>`);
+  });
+
+  it('says it in Spanish when Spanish is chosen', async () => {
+    testLocale.current = 'es';
+
+    const html = await render('http://127.0.0.1:9');
+
+    const es = textsIn('es');
+    expect(html).toContain(`<p>${asHtml(es('home.apiDown'))}</p>`);
+    expect(html).toContain(`>${asHtml(es('home.account'))}</a>`);
   });
 
   it('still renders when the API does not answer', async () => {
     const html = await render('http://127.0.0.1:9');
 
-    expect(html).toBe('<main><h1>Playground</h1><p>The API does not answer.</p></main>');
+    expect(html).toContain(`<p>${asHtml(textsIn('en')('home.apiDown'))}</p>`);
   });
 });
