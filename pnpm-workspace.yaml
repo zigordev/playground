@@ -21,19 +21,20 @@ catalog:
   "@vitejs/plugin-react": 6.3.0
   "@vitest/browser-playwright": 5.1.2
   "@vitest/coverage-v8": 5.1.2
-  "@zigordev/api": 1.47.0
-  "@zigordev/auth": 1.47.0
-  "@zigordev/config": 1.47.0
-  "@zigordev/dev": 1.47.0
-  "@zigordev/email": 1.47.0
-  "@zigordev/events": 1.47.0
-  "@zigordev/flags": 1.47.0
+  "@zigordev/api": 1.49.0
+  "@zigordev/auth": 1.49.0
+  "@zigordev/config": 1.49.0
+  "@zigordev/dev": 1.49.0
+  "@zigordev/email": 1.49.0
+  "@zigordev/events": 1.49.0
+  "@zigordev/flags": 1.49.0
+  "@zigordev/live": 1.49.0
   "@zigordev/notifications-events": 1.5.0
-  "@zigordev/otel": 1.47.0
-  "@zigordev/rum": 1.47.0
+  "@zigordev/otel": 1.49.0
+  "@zigordev/rum": 1.49.0
   "@zigordev/stack": 1.11.0
-  "@zigordev/test": 1.47.0
-  "@zigordev/ui": 1.47.0
+  "@zigordev/test": 1.49.0
+  "@zigordev/ui": 1.49.0
   "drizzle-kit": 0.31.11
   "drizzle-orm": 0.45.4
   "fastify": 5.12.8

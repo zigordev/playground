@@ -46,6 +46,7 @@ It has two jobs.
 | TanStack Query                   | The notes forms' writes from the browser, through `openapi-react-query` on the typed client              |
 | Playwright and axe               | Open every page in Chromium and check it for accessibility and for its content security policy           |
 | `@zigordev/rum`                  | Browser monitoring with Grafana Faro, sending to `/rum` on the product's own address                     |
+| `@zigordev/live`                 | Tells the notes pages at once that a note changed, so they fetch it again                                |
 | The inlang CLI                   | Checks the texts inside `pnpm check`, through the `texts` rule of `zigordev check`                       |
 | `@zigordev/config`               | Reads each app's settings from the environment once, and stops the app when one is wrong                 |
 | `@zigordev/otel`                 | Each app's traces, metrics and log lines, and the answer of its health route                             |
@@ -313,6 +314,16 @@ A person who is signed in keeps their notes at `/notes`. Each page sends a perso
 The pages follow the web rules. A server component reads the API on the server, through the typed client of `packages/playground-api-client`, with the person's cookie, so the list and the note arrive in the page. A form in the browser writes through TanStack Query and `openapi-react-query`, on the same typed client, then moves on and asks the server for the page again. The API decides whose notes these are, as [the notes API](#the-notes-api) says.
 
 In containers the ingress sends `/api` to the API, so the browser's requests reach it at the page's own address. The dev server and the page check have no ingress, so `src/app/api/v1/[...path]/route.ts` hands those requests on to `API_URL`, as `src/app/api/auth/[...all]/route.ts` does for sign-in.
+
+## Live updates
+
+A notes page that is open hears at once when one of its notes changes, in another tab, on another device or through the API, and shows the change without a reload. [`@zigordev/live`](https://github.com/zigordev/toolkit/blob/main/packages/live/README.md) carries it, as toolkit's [record 0044](https://github.com/zigordev/toolkit/blob/main/docs/adr/0044-live-updates-reach-pages-as-server-sent-events.md) says.
+
+- The API adds `GET /api/v1/live` when sign-in is on, in `apps/playground-api/src/plugins/live.ts`. Each person hears only the channel of their own notes, `notes:<their id>`. An API key gets 403, because the stream is for pages.
+- The notes repository saves each new note, change and delete in a transaction that also sends a notice, `note.created`, `note.updated` or `note.deleted`, with the note's id. A note that belongs to nobody, made with an API key, sends none.
+- The web app's `apps/playground-web/src/app/notes/live-notes.client.tsx` keeps the stream open on both notes pages. The list asks the server for the page again on any change, and a note's page on a change to that note.
+- The health answer has the part `live`, which is up while the API listens to PostgreSQL. It is not required, so the API answers `degraded`, not `error`, while live updates are down.
+- The page check proves it on the built app: the stand-in API changes a note and sends the change, and the list shows the new title.
 
 ## The pages and their security
 

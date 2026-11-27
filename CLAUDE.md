@@ -37,5 +37,6 @@ The test product of the zigordev platform: an API on its own PostgreSQL and a we
 - A new secret is a new line `NAME=` in `.env.production.example`, and its value is the owner's to store in Parameter Store before the merge that needs it.
 - The PostgreSQL of this product listens on `127.0.0.1:5434` on the laptop, so that it does not meet the template's on 5433.
 - Browser monitoring sends from every page to `/rum`, which platform routes to Alloy's Faro receiver. A new interaction joins `apps/playground-web/src/lib/interactions.ts` in the pull request that records it.
+- A write that changes what a page shows sends its notice through `notifyChange` of `@zigordev/live`, inside the same transaction, as the notes repository does.
 - A text of the web app changes in `messages/en.json` and `messages/es.json` together. A commit that changes only files in `messages/` may come from Fink, the translators' editor, and keeps its translator as author.
 - A shared file is changed in toolkit, never here. `pnpm check` fails while a copy differs.

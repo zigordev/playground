@@ -22,6 +22,7 @@
     "@tanstack/react-query": "catalog:",
     "@zigordev/auth": "catalog:",
     "@zigordev/config": "catalog:",
+    "@zigordev/live": "catalog:",
     "@zigordev/otel": "catalog:",
     "@zigordev/rum": "catalog:",
     "@zigordev/ui": "catalog:",
