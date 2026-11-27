@@ -32,6 +32,7 @@
     "@zigordev/email": "catalog:",
     "@zigordev/events": "catalog:",
     "@zigordev/flags": "catalog:",
+    "@zigordev/live": "catalog:",
     "@zigordev/notifications-events": "catalog:",
     "@zigordev/otel": "catalog:",
     "drizzle-orm": "catalog:",
