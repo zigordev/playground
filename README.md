@@ -1,6 +1,6 @@
 # playground
 
-The test product of the zigordev platform: an API with its own PostgreSQL and a web app, deployed to <https://playground.zigordev.com> by every green merge to `main`. People sign up, sign in and keep their notes there, in English or Spanish, and the emails of sign-in go out through the notifications service. It was made on 2026-11-24 from the product template of [toolkit](https://github.com/zigordev/toolkit) at version 1.19.0, took a fresh copy of it at version 1.46.0 on 2026-11-26, and keeps the template's shape on purpose.
+The test product of the zigordev platform: an API with its own PostgreSQL and a web app, deployed to <https://playground.zigordev.com> by every green merge to `main`. People sign up, sign in and keep their notes there, in English or Spanish, and the emails of sign-in go out through the notifications service. It was made on 2026-11-24 from the product template of [toolkit](https://github.com/zigordev/toolkit) at version 1.19.0, took a fresh copy of it at version 1.46.0 on 2026-11-26 and its browser monitoring at version 1.47.0 on 2026-11-27, and keeps the template's shape on purpose.
 
 ## What it is
 
@@ -45,6 +45,7 @@ It has two jobs.
 | React Hook Form                  | Every form, checked by a Zod schema, with each problem shown under its field in the person's language    |
 | TanStack Query                   | The notes forms' writes from the browser, through `openapi-react-query` on the typed client              |
 | Playwright and axe               | Open every page in Chromium and check it for accessibility and for its content security policy           |
+| `@zigordev/rum`                  | Browser monitoring with Grafana Faro, sending to `/rum` on the product's own address                     |
 | The inlang CLI                   | Checks the texts inside `pnpm check`, through the `texts` rule of `zigordev check`                       |
 | `@zigordev/config`               | Reads each app's settings from the environment once, and stops the app when one is wrong                 |
 | `@zigordev/otel`                 | Each app's traces, metrics and log lines, and the answer of its health route                             |
@@ -141,6 +142,7 @@ The API's dev process sends to the agent's port on this Mac, `127.0.0.1:4318`. T
 | `KAFKA_BROKERS`, `KAFKA_USERNAME`, `KAFKA_PASSWORD`  | The API          | The broker as `host:port`, and the API's Kafka user and password. All three, or none | Kafka is off, and sign-in cannot be turned on   |
 | `DATABASE_ADMIN_URL`                                 | The job          | The superuser's address, to make the app's role and database                         | The job only migrates                           |
 | `API_URL`                                            | The web          | Where the web app's server reaches the API                                           | The app does not start                          |
+| `RUM_URL`                                            | The web          | The path on the product's own address where browser monitoring sends, `/rum`         | Browser monitoring is off                       |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`                        | OpenTelemetry    | Where the telemetry goes. The compose file names the agent                           | `http://localhost:4318`                         |
 | `OTEL_RESOURCE_ATTRIBUTES`                           | OpenTelemetry    | The environment the app runs in, as `local` or `production`                          | It is left out                                  |
 
@@ -320,6 +322,8 @@ Every page wears the design system, `@zigordev/ui`, and follows the person's lig
 
 `pnpm test:browser`, from the root, runs the web app's browser tests and then its page check, in Chromium. The browser tests render each form and the account's buttons, click and type as a person would, and cover every module named `*.client.tsx`, which `pnpm check` leaves out of its coverage, against the same floor of 90%. The page check starts the web app from its build with a stand-in for the API, and opens every page: in English and Spanish, in light and in dark. It fails on any finding of axe, on anything the policy blocks and on any error in the browser. The pipeline's Browser job runs both on every pull request. Run `pnpm build` first, and `pnpm exec playwright install chromium` once.
 
+Browser monitoring starts on every page once `RUM_URL` names a path on the product's own address. The compose files set it to `/rum`, which platform's shared services route to Alloy's Faro receiver on every address, the laptop's from `@zigordev/stack` 1.11.0 on. [`@zigordev/rum`](https://github.com/zigordev/toolkit/blob/main/packages/rum/README.md) runs Grafana Faro and keeps every query, user and console line in the browser. The playground tracks two interactions, `note.created` and `note.deleted`, listed in `apps/playground-web/src/lib/interactions.ts`. In Grafana, `{source="browser", app_name="playground-web"}` finds the browser's lines in Loki, and its traces continue in the API through the `traceparent` header.
+
 A test of the web app never writes out a text: it reads it from the messages with `textsIn` from `apps/playground-web/test/texts.ts`, so a translator who changes a text in Fink breaks no test.
 
 ## The feature flags
@@ -440,7 +444,6 @@ The pipeline runs the same script on every pull request, in a job named Contract
 
 The template grows in slices, and each new slice reaches this repo as one pull request that copies it in, checked by the same pipeline.
 
-- **Browser monitoring:** the template's web app carries `@zigordev/rum` since toolkit's version 1.43.0. It comes here once that package is on npm and `platform` routes the path to Alloy's Faro receiver, as toolkit's [record 0055](https://github.com/zigordev/toolkit/blob/main/docs/adr/0055-browser-monitoring-carries-over-novembers-rum.md) says. Until then this copy leaves out the files of [toolkit#149](https://github.com/zigordev/toolkit/pull/149).
 - **Google in production:** sign-in at `playground.zigordev.com` offers email and passkeys. Google needs an OAuth client for that address, and its two values in Parameter Store.
 - **What a failed email changes:** the API logs `email.failed`, and nothing more. Telling the person, such as on `/account`, is left for later.
 

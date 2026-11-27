@@ -30,6 +30,7 @@ catalog:
   "@zigordev/flags": 1.47.0
   "@zigordev/notifications-events": 1.5.0
   "@zigordev/otel": 1.47.0
+  "@zigordev/rum": 1.47.0
   "@zigordev/stack": 1.11.0
   "@zigordev/test": 1.47.0
   "@zigordev/ui": 1.47.0
@@ -68,6 +69,8 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - "@zigordev/*"
 trustPolicy: no-downgrade
+trustPolicyExclude:
+  - ua-parser-js@1.0.41
 
 allowBuilds:
   "@parcel/watcher": false
