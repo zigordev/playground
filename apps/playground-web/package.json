@@ -23,6 +23,7 @@
     "@zigordev/auth": "catalog:",
     "@zigordev/config": "catalog:",
     "@zigordev/otel": "catalog:",
+    "@zigordev/rum": "catalog:",
     "@zigordev/ui": "catalog:",
     "next": "catalog:",
     "next-intl": "catalog:",

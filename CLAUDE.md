@@ -36,6 +36,6 @@ The test product of the zigordev platform: an API on its own PostgreSQL and a we
 - The repo keeps the template's shape. A new slice of the template arrives as one pull request that copies it in, and a change that the template should have too goes to toolkit first.
 - A new secret is a new line `NAME=` in `.env.production.example`, and its value is the owner's to store in Parameter Store before the merge that needs it.
 - The PostgreSQL of this product listens on `127.0.0.1:5434` on the laptop, so that it does not meet the template's on 5433.
-- The copy of toolkit v1.46.0 leaves out browser monitoring, the files of toolkit#149, until `@zigordev/rum` is on npm and `platform` routes its path. That slice then comes as its own pull request.
+- Browser monitoring sends from every page to `/rum`, which platform routes to Alloy's Faro receiver. A new interaction joins `apps/playground-web/src/lib/interactions.ts` in the pull request that records it.
 - A text of the web app changes in `messages/en.json` and `messages/es.json` together. A commit that changes only files in `messages/` may come from Fink, the translators' editor, and keeps its translator as author.
 - A shared file is changed in toolkit, never here. `pnpm check` fails while a copy differs.

@@ -6,11 +6,13 @@ import { DeleteNote } from './delete-note.client.tsx';
 
 const api = vi.hoisted(() => ({ remove: vi.fn() }));
 const router = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }));
+const rum = vi.hoisted(() => ({ recordInteraction: vi.fn() }));
 
 vi.mock('../../lib/notes-client.ts', () => ({
   notesClient: { useMutation: () => ({ mutateAsync: api.remove, isPending: false }) },
 }));
 vi.mock('next/navigation', () => ({ useRouter: () => router }));
+vi.mock('@zigordev/rum', () => rum);
 
 afterEach(() => {
   cleanup();
@@ -43,6 +45,7 @@ describe('deleting a note', () => {
 
     await vi.waitFor(() => expect(router.push).toHaveBeenCalledWith('/notes'));
     expect(api.remove).toHaveBeenCalledWith({ params: { path: { noteId: id } } });
+    expect(rum.recordInteraction).toHaveBeenCalledWith('note.deleted');
     expect(router.refresh).toHaveBeenCalled();
   });
 

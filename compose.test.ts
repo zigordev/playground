@@ -407,6 +407,14 @@ describe('playground-api and sign-in', () => {
   });
 });
 
+describe('playground-web and browser monitoring', () => {
+  it("sends what Faro measures to /rum on the product's own address, which platform routes to Alloy's receiver", () => {
+    expect(everywhere.services['playground-web']?.environment?.RUM_URL).toBe('/rum');
+    expect(laptop.services['playground-web']?.environment?.RUM_URL).toBe('/rum');
+    expect(production.services['playground-web']?.environment?.RUM_URL).toBe('/rum');
+  });
+});
+
 describe('the secrets of production', () => {
   it('are named in .env.production.example, and only named', () => {
     const example = parseEnv(readFileSync(`${folder}.env.production.example`, 'utf8'));

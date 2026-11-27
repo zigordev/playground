@@ -6,6 +6,7 @@ import { NoteForm } from './note-form.client.tsx';
 
 const api = vi.hoisted(() => ({ create: vi.fn(), update: vi.fn() }));
 const router = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }));
+const rum = vi.hoisted(() => ({ recordInteraction: vi.fn() }));
 
 vi.mock('../../lib/notes-client.ts', () => ({
   notesClient: {
@@ -13,6 +14,7 @@ vi.mock('../../lib/notes-client.ts', () => ({
   },
 }));
 vi.mock('next/navigation', () => ({ useRouter: () => router }));
+vi.mock('@zigordev/rum', () => rum);
 
 afterEach(() => {
   cleanup();
@@ -50,6 +52,7 @@ describe('the note form', () => {
     expect(api.create).toHaveBeenCalledWith({
       body: { title: 'Buy milk', body: 'Two litres', status: 'open' },
     });
+    expect(rum.recordInteraction).toHaveBeenCalledWith('note.created');
     expect(router.refresh).toHaveBeenCalled();
   });
 
