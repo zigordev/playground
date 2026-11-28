@@ -15,7 +15,7 @@ concurrency:
 jobs:
   pipeline:
     name: Pipeline
-    uses: zigordev/toolkit/.github/workflows/check.yml@9e1e8e84b3cac690d428f13ce1e2a7270f604298 # v1.49.0
+    uses: zigordev/toolkit/.github/workflows/check.yml@4c70e58e670666fcfd05ceb49a8366690d338ac3 # v1.61.0
     with:
       product-folder: .
       browser: true
@@ -42,7 +42,7 @@ jobs:
     name: Publish
     needs: [check]
     if: github.event_name == 'push'
-    uses: zigordev/toolkit/.github/workflows/publish.yml@9e1e8e84b3cac690d428f13ce1e2a7270f604298 # v1.49.0
+    uses: zigordev/toolkit/.github/workflows/publish.yml@4c70e58e670666fcfd05ceb49a8366690d338ac3 # v1.61.0
     permissions:
       contents: read
       packages: write
@@ -53,7 +53,7 @@ jobs:
     name: Deploy
     needs: [publish]
     if: github.event_name == 'push'
-    uses: zigordev/toolkit/.github/workflows/deploy.yml@9e1e8e84b3cac690d428f13ce1e2a7270f604298 # v1.49.0
+    uses: zigordev/toolkit/.github/workflows/deploy.yml@4c70e58e670666fcfd05ceb49a8366690d338ac3 # v1.61.0
     with:
       target: playground
       health-url: https://playground.zigordev.com/health
